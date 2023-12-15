@@ -1,6 +1,6 @@
 //Design Patterns: Builder
 
-/*
+/**
  BUILDER
  Used to divide objects and configurations.
  Swift's builder pattern allows for a large number of 

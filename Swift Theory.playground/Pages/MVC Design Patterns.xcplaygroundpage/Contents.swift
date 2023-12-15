@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
-
-/*
+//MVC
+/**
  MVC one of the most used Swift architecture patterns
  alowwing for clear code separation by 3 roles
  

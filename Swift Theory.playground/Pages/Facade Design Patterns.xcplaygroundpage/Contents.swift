@@ -1,7 +1,7 @@
 import Foundation
 
-/* FACADE
- Provide a simple interface for sophisticated programs.
+// FACADE
+/** Provide a simple interface for sophisticated programs.
  It can generate classes to provide simplified interfaces, regardless
  of the multiple methods.
 */

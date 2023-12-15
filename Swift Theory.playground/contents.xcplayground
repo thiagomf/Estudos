@@ -3,5 +3,8 @@
     <pages>
         <page name='Builder Design Patterns'/>
         <page name='Facade Design Patterns'/>
+        <page name='MVC Design Patterns'/>
+        <page name='Singleton Design Patterns'/>
+        <page name='Adapter Design Patterns'/>
     </pages>
 </playground>
