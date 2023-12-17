@@ -6,5 +6,6 @@
         <page name='MVC Design Patterns'/>
         <page name='Singleton Design Patterns'/>
         <page name='Adapter Design Patterns'/>
+        <page name='Observer Design Patterns'/>
     </pages>
 </playground>

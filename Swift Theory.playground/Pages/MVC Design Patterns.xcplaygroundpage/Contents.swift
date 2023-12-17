@@ -24,6 +24,32 @@ class ViewController: UIViewController {
     @IBOutlet var petName: UILabel!
     @IBOutlet var petLegs: UILabel!
     
+    override func loadView() {
+        
+        let view = UIView()
+        view.backgroundColor = .white
+        
+        let label1 = UILabel()
+        label1.frame(forAlignmentRect: .infinite)
+        label1.text = petName.text
+        label1.textColor = .red
+        
+        let label2 = UILabel()
+        label2.frame(forAlignmentRect: .infinite)
+        label2.textColor = .blue
+        label2.text = petLegs.text
+        
+        let vertical = UIStackView()
+        vertical.axis = .vertical
+        vertical.distribution = .fillEqually
+        vertical.addArrangedSubview(label1)
+        vertical.addArrangedSubview(label2)
+        
+        view.addSubview(vertical)
+        
+        self.view = view
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
