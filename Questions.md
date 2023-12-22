@@ -244,4 +244,149 @@ Use Cases:
 
 Overall, the managed object context is a critical component in Core Data, serving as an interface to the underlying data store and managing the lifecycle of managed objects, making it easier to work with data in a Core Data application.
 
+### What are user interface elements and some common ways you can add them to your app?
 
+User interface (UI) elements are the building blocks that form the visual and interactive components of an app, enabling users to interact with and navigate through the application. 
+
+Some common UI elements in iOS apps include:
+
+> **Labels**: Used to display static text or information on the screen.
+
+> **Buttons**: Allow users to trigger actions or navigate within the app.
+
+> **Text Fields and Text Views**: Input fields for users to enter text or data.
+
+> **Image Views**: Display images or graphics within the app.
+
+> **Table Views**: Present data in a scrollable list format with customizable cells.
+
+> **Collection Views**: Similar to table views but more versatile, allowing for grid-based layouts and custom cell arrangements.
+
+> **Stack Views**: Containers that arrange other UI elements in a stack, either horizontally or vertically, simplifying layout.
+
+> **Navigation Bars and Tab Bars**: Commonly used for app navigation, providing easy access to different sections or functionalities.
+
+> Alerts and Action Sheets: Used to display messages, alerts, or actions to the user.
+
+> Switches, Sliders, and Steppers: Controls for selecting options, adjusting values, or enabling/disabling features.
+
+
+Common Ways to Add UI Elements:
+
+> **Interface Builder (Storyboard or XIBs)**: Using Xcode's Interface Builder, developers can visually design UI elements by dragging and dropping them onto a canvas. Interface Builder allows configuring properties, setting constraints, and connecting UI elements to code via outlets and actions.
+
+> **Programmatic Creation**: UI elements can be created and configured entirely in code using UIKit APIs. This approach provides full control over element customization and layout and is often used for dynamic or complex interfaces.
+
+> **UIKit Components**: Apple's UIKit framework provides a wide range of pre-built UI elements that developers can directly instantiate and customize to suit their app's needs. These components offer various functionalities and visual styles out of the box.
+
+> **Third-party Libraries and Frameworks**: Developers can use third-party libraries or frameworks available via package managers like CocoaPods or Swift Package Manager. These libraries often offer additional UI components, custom designs, or enhanced functionalities that can be easily integrated into an app.
+
+
+The choice of adding UI elements depends on factors like developer preference, complexity of the UI, reusability, and the specific requirements of the application. Many apps use a combination of Interface Builder for visual layout and code for more dynamic or complex UI configurations.
+
+### What are some common execution states in iOS?
+
+In iOS, apps can transition between various execution states based on user interactions, system events, or app-specific actions. 
+
+Some common execution states include:
+
+> **Not Running**: The app is not launched or has been terminated by the user or the system. It's not currently executing.
+
+> **Inactive**: The app is in the foreground but is not receiving events, such as during a transition or when another app is briefly in the foreground. This state occurs momentarily before transitioning to either active or background state.
+
+> **Active**: The app is in the foreground, actively responding to user interactions, and is the visible app on the screen.
+
+> **Background**: The app is running in the background but is not actively visible. It might continue performing certain tasks like playing audio, receiving location updates, or processing data in the background.
+
+> **Suspended**: The app is in the background but is not executing code. It's in a suspended state to conserve resources. The system may terminate suspended apps if it needs more resources.
+
+> **Terminated**: The app is not running and has been terminated by the system or the user.
+
+These execution states are part of the app lifecycle managed by the iOS operating system. An app transitions between these states based on various triggers such as user actions, system events (e.g., incoming calls), or background tasks the app is performing. Understanding these states is crucial for handling interruptions, saving state information, managing resources efficiently, and ensuring a smooth user experience.
+
+### Explain the difference between raw and associated values in Swift.
+
+**Raw Values**:
+
+> Raw values are fixed, pre-defined values associated with each case of an enum. These values must be of the same type and are set at the time of enum declaration.
+
+**Usage**: 
+Raw values are useful when you need to assign a default or predefined value to each case of an enum. Enums with raw values conform to protocols like Hashable and RawRepresentable, allowing you to initialize an enum using its raw value and access the raw value of an enum case.
+
+```
+enum Suit: String {
+    case hearts = "Hearts"
+    case diamonds = "Diamonds"
+    case clubs = "Clubs"
+    case spades = "Spades"
+}
+
+let hearts = Suit.hearts.rawValue // Accessing raw value
+let suit = Suit(rawValue: "Diamonds") // Initializing enum using raw value
+```
+
+**Associated Values**:
+
+Associated values are used to attach additional data of varying types to each case of an enum. Unlike raw values, associated values can be different for each case and are set when creating an instance of that enum case.
+
+**Usage**: Associated values are beneficial when you need to associate extra information or data with a particular case of an enum. They allow flexibility in storing and passing different types of data along with enum cases.
+
+```
+enum Barcode {
+    case upc(Int, Int, Int, Int)
+    case qrCode(String)
+}
+
+let productCode = Barcode.upc(8, 85909, 51226, 3) // Creating enum case with associated values
+let qr = Barcode.qrCode("ABCDEF12345") // Another case with different associated value
+```
+
+### What security best practices do you know?
+
+**Secure Storage of Sensitive Information:**
+
+> Avoid hardcoding sensitive data like API keys or credentials directly into the source code. Use secure storage solutions like Keychain Services or environment variables.
+
+**Data Encryption:**
+
+> Utilize encryption mechanisms provided by iOS, such as Keychain Services or Data Protection API, to encrypt and protect sensitive user data stored locally on the device.
+
+**Secure Network Communication:**
+
+> Use secure communication protocols (like HTTPS) when making network requests. Ensure data transmitted over the network is encrypted, preventing eavesdropping by using secure transport protocols like TLS/SSL.
+
+**Input Validation and Sanitization:**
+
+> Validate and sanitize user inputs to prevent common vulnerabilities such as injection attacks (e.g., SQL injection, cross-site scripting). Don't execute code based on untrusted inputs without proper validation and sanitization.
+
+**Safe Use of APIs and Libraries:**
+
+> Choose and use well-established, regularly updated libraries and APIs from trusted sources. Keep third-party dependencies updated to mitigate vulnerabilities found in older versions.
+
+**Memory Management:**
+
+> Follow best practices in memory management to prevent vulnerabilities like buffer overflows or memory leaks. Utilize Swift's memory management features like Automatic Reference Counting (ARC) to handle memory efficiently.
+
+**Proper Error Handling:**
+
+> Handle errors and exceptions in Swift code appropriately to prevent potential vulnerabilities and crashes. Use Swift's error handling mechanisms to manage exceptions gracefully.
+
+**Code Review for Security:**
+
+> Conduct regular code reviews to identify security vulnerabilities, potential risks, and adherence to secure coding practices. Consider using static analysis tools to scan the codebase for security issues.
+
+**Secure UI Components:**
+
+> Ensure that user interface components (such as text fields, web views, etc.) are handled securely, preventing issues like information disclosure or input manipulation.
+
+**Implement App Transport Security (ATS):**
+
+> Use App Transport Security settings to enforce secure network connections and limit unencrypted communication.
+
+**Protection Against Reverse Engineering:**
+
+> Employ techniques to protect the app against reverse engineering, like code obfuscation, encryption, or anti-tamper measures to safeguard sensitive code and logic.
+
+**Utilize App Sandbox and Permissions:**
+
+> Leverage iOS's sandboxing model and implement appropriate permissions to restrict the app's access to system resources and user data, ensuring the least privilege access.
