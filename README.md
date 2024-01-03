@@ -93,7 +93,7 @@ Swift is a powerful and intuitive prgramming language.
 
 ### LET and VAR
 
-**LET**, declares a constante, meaning the value assigned toit cannot be changed once it's set.
+**LET**, declares a constante, meaning the value assigned to it cannot be changed once it's set.
 
 **VAR**, declares a variable, allowing the valuw to be changed or mutated.
 
@@ -507,5 +507,262 @@ class Car: Vehicle {
 }
 ```
 
+### GCD
+
+Sometimes we are trying to perform multiple tasks at the same time,that time most of the developer facing applcationg hang or freezing issue. That's why **we are using GCD, to manage multiple task at the same time.**
+
+**Concurrenct** - It's starting multiple tasks at the same time, but not garantee for the finish at same time. It's can finish any order.
+
+**Serial** - It's executing one task at a time.
+
+```
+// Get a reference to the global concurrent queue
+let concurrentQueue = DispatchQueue.global()
+
+// Perform a task asynchronously on the concurrent queue
+concurrentQueue.async {
+    // This code will run concurrently with other tasks
+    print("Concurrent task")
+}
+
+// Get a reference to a serial queue
+let serialQueue = DispatchQueue(label: "com.example.serialQueue")
+
+// Perform a task synchronously on the serial queue
+serialQueue.sync {
+    // This code will execute in a serial manner
+    print("Serial task")
+}
+```
 
 
+#### Sync vs Async
+
+**Sync** - When a work item is executed synchronously with the sync method, the program waits until execution finishes before the method call returns.
+
+```
+func syncWork(){
+        let northZone = DispatchQueue(label: "perform_task_with_team_north")
+        let southZone = DispatchQueue(label: "perform_task_with_team_south")
+        
+        northZone.sync {
+            for numer in 1...3{ print("North \(numer)")}
+        }
+        southZone.sync {
+            for numer in 1...3{ print("South \(numer)") }
+        }
+    }
+    
+    //Call Func here 
+    syncWork()
+    
+//Output
+//    North 1
+//    North 2
+//    North 3
+//    South 1
+//    South 2
+//    South 3
+```
+
+**Async** - execute asynchronouly with the async method, the method call return immediately.
+
+```
+func asyncWork(){
+        let northZone = DispatchQueue(label: "perform_task_with_team_north")
+        let southZone = DispatchQueue(label: "perform_task_with_team_south")
+        
+        northZone.async {
+            for numer in 1...3{ print("North \(numer)") }
+        }
+        southZone.async {
+            for numer in 1...3{ print("South \(numer)") }
+        }
+    }
+
+//Call Async Task
+asyncWork()
+
+//OutPut 
+//    North 1
+//    South 1
+//    North 2
+//    South 2
+//    North 3
+//    South 3
+```
+
+**Global Queue** - Using to perform non-UI work in the background.
+
+**Main Queue** - Using to update the UI after completing work in a task on a concurrent queue.
+
+### Typealias
+
+Typealies is an alternative name for an existing data type or complex type. It allows developers to define a new name for an existing type, making the code more readable, concise and flexibe.
+
+**Exemple**: typelias creates a new name "Distance" for the Double
+
+```
+typealias Distance = Double
+
+let distance: Distance = 10.5
+
+```
+
+**Exemple**: this typelias ActionClosures, represents a closure that takes no parameters and return void.
+
+```
+typealias ActionClosure = () -> Void
+
+let performAction: ActionClosure = {
+    print("Performing action")
+}
+```
+
+Exemple: Typelias define UserInfo as a tuple typle.
+
+```
+typealias UserInfo = (name: String, age: Int, email: String)
+
+func processUser(info: UserInfo) {
+    // Process user information
+}
+```
+
+### Tuples
+
+Tuples allow you to group multiple values into a single compound value. They are useful form temporary grouping of values and can hold any combination of different types.
+
+```
+let namedPerson = (name: "Sarah", age: 25)
+print(namedPerson.name) // Accessing named elements
+print(namedPerson.age)
+```
+
+Tuples can be used as return types for functions to return multiple values
+
+```
+func calculateValues() -> (Double, Double) {
+    let result1 = 3.5
+    let result2 = 7.2
+    return (result1, result2)
+}
+
+let (value1, value2) = calculateValues()
+print("Value 1: \(value1), Value 2: \(value2)")
+```
+
+### Closure
+
+Closure are similar to functions but are defined in a more concise manner, often as inline expressions.
+
+**Function-Like**: Closures can capture and store references to variables and constants from the surrounding context in which they're defined, smilar to nested functions.
+
+**Capture Values**: They capture the values of variables and constants from their enclosing context, even if they're defined outside the closure's body.
+
+**Syntax**: Closures can be written in different forms, including: Using {} braces to encapsulate the closure body
+
+With shorthand argument names ($0, $1)
+
+Examples: 
+
+**Basic example**
+
+```
+let greet = {
+    print("Hello, closure!")
+}
+
+// Calling the closure
+greet() // Prints: "Hello, closure!"
+```
+
+**Sorting Collections**
+
+```
+let numbers = [5, 2, 7, 1, 9]
+let sortedNumbers = numbers.sorted { $0 < $1 }
+print(sortedNumbers) // Prints: [1, 2, 5, 7, 9]
+```
+
+**Map Functions**
+
+the map functions applies a given closure to each element of an array and returns a new array with the returns.
+
+```
+let numbers = [1, 2, 3, 4, 5]
+let squaredNumbers = numbers.map { $0 * $0 }
+print(squaredNumbers) // Prints: [1, 4, 9, 16, 25]
+```
+
+**Filter function**
+
+The filter functions uses a closure to determine which elements of an array should be included in the resulting array.
+
+```
+let numbers = [10, 20, 30, 40, 50]
+let filteredNumbers = numbers.filter { $0 > 25 }
+print(filteredNumbers) // Prints: [30, 40, 50]
+```
+
+**Asynchronous Operations**
+
+Closures are often used for handling asynchronous tasks, like network request.
+
+```
+func fetchData(completion: @escaping (String) -> Void) {
+    DispatchQueue.global().async {
+        // Simulating a network request
+        Thread.sleep(forTimeInterval: 2)
+        let result = "Data fetched"
+        DispatchQueue.main.async {
+            completion(result)
+        }
+    }
+}
+
+// Using the fetchData function
+fetchData { data in
+    print(data) // Prints: "Data fetched"
+}
+```
+
+**Sorting with Custom Logic**
+
+Sorting an array of custom objects based on a specific property using closure.
+
+```
+struct Person {
+    let name: String
+    let age: Int
+}
+
+let people = [
+    Person(name: "Alice", age: 25),
+    Person(name: "Bob", age: 30),
+    Person(name: "Charlie", age: 20)
+]
+
+let sortedPeople = people.sorted { $0.age < $1.age }
+print(sortedPeople.map { $0.name }) // Prints: ["Charlie", "Alice", "Bob"]
+```
+
+**Capturing Values**
+
+Closure can capture and store references to variables and constants from their surrounding context.
+
+```
+func makeIncrementer(incrementAmount: Int) -> () -> Int {
+    var total = 0
+    return {
+        total += incrementAmount
+        return total
+    }
+}
+
+let incrementByFive = makeIncrementer(incrementAmount: 5)
+print(incrementByFive()) // Prints: 5
+print(incrementByFive()) // Prints: 10
+```
+
+Protocol
