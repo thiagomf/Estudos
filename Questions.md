@@ -266,9 +266,9 @@ Some common UI elements in iOS apps include:
 
 > **Navigation Bars and Tab Bars**: Commonly used for app navigation, providing easy access to different sections or functionalities.
 
-> Alerts and Action Sheets: Used to display messages, alerts, or actions to the user.
+> **Alerts and Action Sheets**: Used to display messages, alerts, or actions to the user.
 
-> Switches, Sliders, and Steppers: Controls for selecting options, adjusting values, or enabling/disabling features.
+> **Switches, Sliders, and Steppers**: Controls for selecting options, adjusting values, or enabling/disabling features.
 
 
 Common Ways to Add UI Elements:
