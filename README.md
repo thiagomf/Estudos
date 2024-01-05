@@ -68,7 +68,7 @@ Swift is a powerful and intuitive programming language.
 
 **Modern Syntax:** it includes features like closures, tuples, generics and powerful pattern matching.
 
-**Performance:** is designed to be fast and efficient. The performing is better tahm objctive-c. 
+**Performance:** is designed to be fast and efficient. The performing is better than objctive-c. 
 
 **Interoperability:** Swift can work seamlessly with existing Objective-C. 
 
@@ -122,7 +122,7 @@ The word final is used to declare that a class, method or property cannot be ove
 
 #### Final Classes
 
-Declaring a class as final means it cannot be subclassed. Any attempt.to subclass a final class will result in a compilation error.
+Declaring a class as final means it cannot be subclassed. Any attempt to subclass a final class will result in a compilation error.
 
 ```
 final class FinalClass {
@@ -210,6 +210,32 @@ Guard helps in writing defensive code by handling the conditions that must be me
 
 **Early Exit**: It ensures that the rest of the code executes only when certain conditions are met, reducing nested code block and improving readability.
 
+**Example:** 
+
+```
+func processOrder(order: [String: Any]) {
+    guard let orderId = order["id"] as? Int else {
+        print("Invalid order: Missing or invalid order ID")
+        return
+    }
+
+    guard let items = order["items"] as? [String], !items.isEmpty else {
+        print("Invalid order: Missing or empty items list")
+        return
+    }
+
+    // Process the order since required conditions are met
+    print("Processing order with ID: \(orderId)")
+    print("Items to process: \(items)")
+    
+    // ... rest of the code to handle the order
+}
+```
+
+// Example usage
+let sampleOrder: [String: Any] = ["id": 123, "items": ["Product1", "Product2", "Product3"]]
+processOrder(order: sampleOrder)
+
 
 ## Differences between Protocol Oriented Programming (POP) and Object-Oriented Programming (OOP)
 
@@ -281,7 +307,7 @@ class AnotherViewController: UITableViewController {
 
 > You can see how that could get complicated. You need to explicity reference the intermediate object ProfileManager each time.
 
-On the other hander, **Protocol - Oriented Programming POP** emphansizes the use of protocols to define a blueprint of methods, properties and other requirements that a type should adopt. Protocols can be seen as contracts that define a set of functionalities without specifiying how they should be implemented. Types (classes, structures, or enumerarions) can then conform to theses protocols by providing implementations for the requiredfunctionalities. POP encourages composition over inheritance and enable more flexibility and code reuse by allowing types to conform to multiple protocols.
+On the other hander, **Protocol - Oriented Programming POP** emphansizes the use of protocols to define a blueprint of methods, properties and other requirements that a type should adopt. Protocols can be seen as contracts that define a set of functionalities without specifiying how they should be implemented. Types (classes, structures, or enumerarions) can then conform to theses protocols by providing implementations for the required functionalities. POP encourages composition over inheritance and enable more flexibility and code reuse by allowing types to conform to multiple protocols.
 
 ```
 protocol Flyer {
@@ -523,7 +549,7 @@ class Motorbike {
 let motorbike = Motorbike(radius: 22, km: 34.5)
 motorbike.km += 1
 
-print(motorbike.km)
+print(motorbike.km) //35.5
 ```
 
 ## ARC
@@ -613,9 +639,15 @@ john = nil // Deallocates Customer and CreditCard
 
 Arc is for managing reference types (classes). Value types, such as structs and enums don't use reference counting and are managed differently - they are copied when passed around rather than referenced.
 
+> Memory for value types is directly allocated where they're defined, making their memory management very efficient.
+
+> When a value type goes out of scope, Swift automatically deallocates its memory.
+
+> For instance, when a function finishes executing and its local variables (value types) go out of scope, the memory they were using is automatically deallocated.
+
 ## Circular Reference or Retain Cycles
 
-A **circular reference**, also know as a **retain cycle**, occurs when two or more objects hold a strong reference to each other, preventing the system from **deallocating** memory even whem they're no longer needed. This situation can happen when using **closures** or when two objects have properties that hold references to each other strongly.
+A **circular reference**, also know as a **retain cycle**, occurs when two or more objects hold a strong reference to each other, preventing the system from **deallocating** memory even when they're no longer needed. This situation can happen when using **closures** or when two objects have properties that hold references to each other strongly.
 
 **Example strong reference:**
 
@@ -645,6 +677,41 @@ class ClassB {
 ```
 
 By using **weak**, the references between **ClassA** and **ClassB** become non-owning references, allowing the objects to be deallocated.
+
+**Another Example using MVP:**
+
+```
+protocol PresenterProtocol: AnyObject {
+    func onViewLoaded()
+}
+
+protocol ViewProtocol: AnyObject {
+    func displayData(_ data: String)
+}
+
+class Presenter: PresenterProtocol {
+    weak var view: ViewProtocol?
+    
+    func onViewLoaded() {
+        // Perform operations
+        view?.displayData("Some data")
+    }
+}
+
+class ViewController: UIViewController, ViewProtocol {
+    var presenter: PresenterProtocol?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        presenter?.view = self
+        presenter?.onViewLoaded()
+    }
+    
+    func displayData(_ data: String) {
+        // Display data in the view
+    }
+}
+```
 
 ## Category / Extensions / Extending Types
 
@@ -685,7 +752,7 @@ someInt.doSomething() // Prints: "Int type implementing CustomProtocol"
 
 ## Overload & Override
 
-#### Overload
+### Overload
 
 The method overloading allows a class to have a multiple methods with the same name but different parameters or arguments types.
 
@@ -723,7 +790,7 @@ class Car: Vehicle {
 
 ## GCD
 
-Sometimes we are trying to perform multiple tasks at the same time,that time most of the developer facing applcationg hang or freezing issue. That's why **we are using GCD, to manage multiple task at the same time.**
+Sometimes we are trying to perform multiple tasks at the same time,that time most of the developer facing applications hang or freezing issue. That's why **we are using GCD, to manage multiple task at the same time.**
 
 **Concurrenct** - It's starting multiple tasks at the same time, but not garantee for the finish at same time. It's can finish any order.
 
