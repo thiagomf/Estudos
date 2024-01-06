@@ -8,20 +8,6 @@ Arquitetura e organização:
 - Interface builder: .xib, viewCode e SwiftUI, como ele constrói as interfaces
 - Gerenciadores de dependecias: Cocoapods, Carthage e Swift Package Manager
 
-Swift
-
-- O que é throws?
-- Para que serve o async e await?
-
-P.O.O e boas práticas
-
-- O que é SOLID?
-- Qual a diferença entre herança e composição?
-- O que é polimorfismo?
-- O que é encapsulamento?
-- Explique como funciona uma sobrecarga?
-- Code review, normalmente você faz?
-
 Design patterns
 
 - O que é Strategy?
@@ -34,12 +20,6 @@ Testes
 - O que é BDD e TDD? Qual a diferença entre os dois?
 - Já utilizou XCTest? Como funciona o ciclo de testes com o XCTest?
 - Com funciona uma pirâmide de testes? Explique os níveis
-
-
-CI/CD
-
-- Já utilizou C.I? Explique para que serve?
-- Já utilizou C.D? Explique para que serve?
 
 Agilidade
 
@@ -59,6 +39,268 @@ Agilidade
 **View Code**: in contrast to using Interface builder, when you create views using code, you're essentially instantiating and configuring UI elements directly in your Swift files rather that visually designing them in Interface builder.
 
 **SwiftUI**: is a declarative UI framework introduced by Apple, you can define your user interface entirely in Swift code using SwiftUI's views, modifiers, and containers.
+
+## SOLID
+
+SOLID represent five principles of object-oriented programming and design aimed at creating more maintainable, scalable, and understandable software.
+
+#### Principles
+
+##### Single Responsibility Principle
+
+A class or module should have only one reason to change. It should be responsible for only one specific task or functionality.
+> Helps in keeeping code focused, understandable and maintainable.
+
+Example: 
+**Example violating SRP**
+
+```
+// Example violating SRP
+class User {
+    func login(username: String, password: String) {
+        // Logic for user authentication
+        // ...
+        // Code for handling UI or network operations directly
+    }
+    
+    func updateUserProfile() {
+        // Logic for updating user profile
+        // ...
+        // Code for handling UI or network operations directly
+    }
+}
+```
+**Refactored Example: Separe Responsibilities**
+
+```
+// SRP-compliant approach
+
+// Authentication Manager responsible for user authentication
+class AuthenticationManager {
+    func login(username: String, password: String) -> Bool {
+        // Logic for user authentication
+        // ...
+        return true // or false based on success or failure
+    }
+}
+
+// User Profile Manager responsible for managing user profile
+class UserProfileManager {
+    func updateUserProfile() {
+        // Logic for updating user profile
+        // ...
+    }
+}
+```
+##### Open/Closed Principle (OCP)
+
+Software entities (classes, modules, functions) should be open for extension but closed for modification.
+
+Allows extending behavior without altering existing code, promoting modularity and scalability.
+
+```
+// Base Shape Protocol
+protocol Shape {
+    func area() -> Double
+}
+
+// Different Shapes conforming to the Shape protocol
+struct Circle: Shape {
+    let radius: Double
+    
+    func area() -> Double {
+        return Double.pi * radius * radius
+    }
+}
+
+struct Rectangle: Shape {
+    let width: Double
+    let height: Double
+    
+    func area() -> Double {
+        return width * height
+    }
+}
+
+// Area Calculator
+struct AreaCalculator {
+    static func calculateArea(shapes: [Shape]) -> Double {
+        return shapes.reduce(0) { $0 + $1.area() }
+    }
+}
+```
+
+The **AreaCalculator** is open for extension: if a new shape (ex.: Triangle) is added by conforming to the **Shape** protocol, the AreaCalculator doesn't need modification. It can work with the new shape without its existing code.
+
+##### Liskov Substitution Principle
+
+Objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.
+
+Ensures that derived classes can be used interchangeably with their base classes withount unexpected behavior.
+
+**Example Shape Hierarchy**:
+
+Let's consider a hierarchy of shapes where **Retangle** and **Square** inherit from a base class **Shape**. According to LSP, a Square should be substitutable for a Shape without causing unexpected behavior.
+
+```
+// Base Shape class
+class Shape {
+    func area() -> Double {
+        return 0.0
+    }
+}
+
+// Rectangle class inheriting from Shape
+class Rectangle: Shape {
+    var width: Double
+    var height: Double
+    
+    init(width: Double, height: Double) {
+        self.width = width
+        self.height = height
+    }
+    
+    override func area() -> Double {
+        return width * height
+    }
+}
+
+// Square class inheriting from Rectangle
+class Square: Rectangle {
+    init(sideLength: Double) {
+        super.init(width: sideLength, height: sideLength)
+    }
+}
+
+// Function to calculate total area of shapes
+func calculateTotalArea(shapes: [Shape]) -> Double {
+    return shapes.reduce(0) { $0 + $1.area() }
+}
+```
+
+**Usage demonstrating LSP**:
+
+```
+let rectangle = Rectangle(width: 5.0, height: 4.0)
+let square = Square(sideLength: 5.0)
+
+let totalArea = calculateTotalArea(shapes: [rectangle, square])
+print("Total area:", totalArea)
+```
+
+According to LSP, a Square is a special case of a Retangle, where all sides are equal. However, using inheritance in this manner might violetate the principle, as modifying the width of a Square would need to affect it's height to maintain equality.
+
+#### Interface segregation principle (ISP)
+
+Clients should not be forced to depend on interfaces they don't use.
+
+Promotes creating specific, focused interfaces rather than large, general-purpose ones, preventing unnecessary dependencies.
+
+Example: 
+
+```
+// Printable protocol for printing functionality
+protocol Printable {
+    func printDocument()
+}
+
+// Scannable protocol for scanning functionality
+protocol Scannable {
+    func scanDocument()
+}
+
+// Machine class conforming to both Printable and Scannable protocols
+class Machine: Printable, Scannable {
+    func printDocument() {
+        print("Printing document...")
+    }
+    
+    func scanDocument() {
+        print("Scanning document...")
+    }
+}
+```
+Applying Interface Segregation Principle:
+
+```
+// Printer protocol for printing functionality only
+protocol Printer {
+    func printDocument()
+}
+
+// Updated Machine conforming to Printer protocol
+extension Machine: Printer {}
+
+// Printer class that uses the Printer protocol
+class PrinterClient {
+    let printer: Printer
+    
+    init(printer: Printer) {
+        self.printer = printer
+    }
+    
+    func executePrint() {
+        printer.printDocument()
+    }
+}
+
+```
+
+Applying the Interface Segregation Principle helps in desiging more focused and specialized protocols, reducing unnecessary dependencies and making the codebase more maintainable and adaptable to change.
+
+##### Dependency Inversion Principle (DIP)
+
+High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+Abstractions (interfaces, protocols) should not depend on details; details should depend on abstractions.
+
+Encourages the use of abstractions to decouple components and reduce dependencies.
+
+```
+// Messenger protocol defining the behavior for sending messages
+protocol Messenger {
+    func sendMessage(message: String)
+}
+
+// Concrete implementation of the Messenger protocol
+class EmailService: Messenger {
+    func sendMessage(message: String) {
+        print("Email sent: \(message)")
+    }
+}
+
+class SMSService: Messenger {
+    func sendMessage(message: String) {
+        print("SMS sent: \(message)")
+    }
+}
+
+// MessageService that depends on the Messenger protocol
+class MessageService {
+    let messenger: Messenger
+    
+    init(messenger: Messenger) {
+        self.messenger = messenger
+    }
+    
+    func sendNotification(message: String) {
+        messenger.sendMessage(message: message)
+    }
+}
+```
+**Usage Demonstrating DIP**
+
+```
+let emailMessenger = EmailService()
+let smsMessenger = SMSService()
+
+let emailMessageService = MessageService(messenger: emailMessenger)
+let smsMessageService = MessageService(messenger: smsMessenger)
+
+emailMessageService.sendNotification(message: "Important email notification")
+smsMessageService.sendNotification(message: "Urgent SMS alert")
+```
+
 
 ## What is swift? 
 
@@ -115,6 +357,144 @@ open class MyOpenClass {
 **filePrivateProperty** is acessible within the file where MyOpenClass is defined.
 
 **privateProperty** is only accessible within MyOpenClass itself.
+
+## Encapsulation
+
+Encapsulation in Swift refers to the principle of bundling the implementation details of an entity (like a class, struct, or a enum) with its interface or public API, restricting access to certain components while exposing others. It aims to hide the internal workings of an entity and only provide access to the necessary parts, promoting better code organization, readability, and maintainability.
+
+#### Access Control
+
+Keywords: public, internal, privatem fileprivate
+
+#### Hide implementation Details
+
+Allow you to hide the internal implementation details of class or struct, exposing only the necessarry parts through its public interface.
+
+Encourages clients to interact with the entity using it's designated methods and properties rather that directly accessing its internal state.
+
+#### Data Hiding
+
+It helps in protecting the integrity of an entity's data by providing controlled access through methods (getters, setters) and preventing direct modification of properties.
+
+#### Code Modularity
+
+Encapsulation facilitates code modularity by organizing code into distinct components with clear boundaries and limited exposure to the outside world.
+
+Modules, classes and structs can encapsulate their functionality reducing dependecies and making the codebase more maintainable.
+
+```
+class BankAccount {
+    private var balance: Double = 0.0
+    
+    // Public interface to interact with the account balance
+    func deposit(amount: Double) {
+        balance += amount
+    }
+    
+    func withdraw(amount: Double) {
+        if amount <= balance {
+            balance -= amount
+        } else {
+            print("Insufficient balance")
+        }
+    }
+    
+    func getBalance() -> Double {
+        return balance
+    }
+}
+
+// Usage
+let account = BankAccount()
+account.deposit(amount: 1000.0)
+account.withdraw(amount: 500.0)
+print("Current Balance:", account.getBalance()) // Accessing the balance through the public method
+```
+
+## Monolithic Repository or Monorepo
+
+Monolithic is where multiple projects or components are stored within a single repository. In the context of Swift or any other programming language, a monorepo might contain multiple Swift projects, libraries, frameworks, or modules within a single repository.
+
+#### Characteristics
+
+##### Single Repository
+
+All related Swift projects, libraries, or modules are stored within a single version control repository
+
+This contrast with the traditional approach of having separate repositories for individual projects or components.
+
+##### Shared History and Codebase
+
+All code within a monorepo shares the same version control history.
+
+Changes made across different projects or components are tracked together within the same repository.
+
+##### Code Sharing and Collaboration
+
+Developers working within a monorepo have easy access to shared code and resources.
+
+Collaboration and sharing between different projects/modules are simplified since they're all part of the same repository
+
+##### Consistent Tooling and Processes
+
+A monorepo allows for consistent tooling, build processes, and versioning across all components within the repository.
+
+It promotes standardized practices and conventions across the entire codebase.
+
+### Challengers:
+
+**Increased complexity**: handling a large codebase within a single repository become complex and cumbersome.
+
+**Build and Test Overheads**: Large monorepos might have longer build and test times due to the interconnectedness of components.
+
+**Access Control**: Granular access control and permissions become crucial when multiple teams work on diffenrent parts of the monorepo.
+
+## Modularization
+
+Modularization in Swift refers to the practice of organizing a codebase into smaller, self-contained modules or units that encapsulate specific functionalities.
+
+This approach promotes code separation, reusability, and maintainabilty by dividing a large codebase into smaller, more manageable parts.
+
+You can create separate modules for different features such: 
+1. User authentication
+2. Networking
+3. UI components
+4. Data persistence
+
+## Polymorphism
+
+Polymorphism refers to the ability of different objects to be treated as instances of a commom superclass or conforming to a shared protocol, allowing them to be used interchangeably through a uniform interface.
+
+Polymorphism in Swift allows for code that is more adaptable, reusable, and maintains a high level of abstraction, enabling the use of a common interface to work with diverse type without needing to know their specific implementation details at compile time.
+
+```
+// Superclass
+class Vehicle {
+    func drive() {
+        print("Driving a vehicle")
+    }
+}
+
+// Subclasses
+class Car: Vehicle {
+    override func drive() {
+        print("Driving a car")
+    }
+}
+
+class Bike: Vehicle {
+    override func drive() {
+        print("Riding a bike")
+    }
+}
+
+// Usage
+let vehicle1: Vehicle = Car()
+let vehicle2: Vehicle = Bike()
+
+vehicle1.drive() // Output: "Driving a car"
+vehicle2.drive() // Output: "Riding a bike"
+```
 
 ## Final
 
@@ -231,11 +611,6 @@ func processOrder(order: [String: Any]) {
     // ... rest of the code to handle the order
 }
 ```
-
-// Example usage
-let sampleOrder: [String: Any] = ["id": 123, "items": ["Product1", "Product2", "Product3"]]
-processOrder(order: sampleOrder)
-
 
 ## Differences between Protocol Oriented Programming (POP) and Object-Oriented Programming (OOP)
 
@@ -877,6 +1252,83 @@ asyncWork()
 
 **Main Queue** - Using to update the UI after completing work in a task on a concurrent queue.
 
+
+## Async/Await
+
+#### Asyncs Function
+
+Functions marked with **async** can perform asynchronous operations and suspend their execution without blocking the thread.
+
+Example: 
+
+```
+func fetchData() async throws -> Data {
+    // Asynchronous operation, e.g., fetching data from a network
+    let data = try await URLSession.shared.data(from: someURL).0
+    return data
+}
+```
+
+##### Await
+
+Awaiting results is used within and async function to await the completion of an asynchronous task and retrieve its result.
+
+**Await** is used before an expression that return a value from an asynchronous task.
+
+```
+async func processData() {
+    do {
+        let data = try await fetchData()
+        // Process the fetched data asynchronously
+    } catch {
+        // Handle errors from fetchData() here
+    }
+}
+```
+
+Async and Await functionality simplifies asynchronous programming by providing a mode straightforward and intuitive way to work with asynchronous tasks, promoting cleaner and more maintainable code when dealing with asynchronous operations such as networks requests, file I/O, and other non-blocking tasks.
+
+Asynchronous operation whitin async functions are marked with await, indicating points where the code waits for the asynchronous operation to complete before proceeding.
+
+**Benefits**: 
+
+**Readability**: Async and await make asynchronous code mode readable and easier to understand, resembling synchronous code flow.
+
+**Error Handling**: Provides a structured way to handle error thrown by asynchronous operations.
+
+**Exemple**: 
+
+```
+import Foundation
+
+func fetchData(from url: URL) async throws -> Data {
+    let (data, response) = try await URLSession.shared.data(from: url)
+    guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        throw URLError(.badServerResponse)
+    }
+    return data
+}
+
+func processFetchedData() async {
+    let url = URL(string: "https://jsonplaceholder.typicode.com/posts/1")!
+    do {
+        let data = try await fetchData(from: url)
+        // Process the fetched data here (e.g., decode JSON, update UI)
+        print("Fetched data:", String(data: data, encoding: .utf8) ?? "Unable to decode")
+    } catch {
+        print("Error fetching data:", error)
+    }
+}
+
+// Run the async function
+Task {
+    await processFetchedData()
+}
+
+```
+
+This example demonstrates the use of await to supende
+
 ## Typealias
 
 Typealies is an alternative name for an existing data type or complex type. It allows developers to define a new name for an existing type, making the code more readable, concise and flexibe.
@@ -931,6 +1383,117 @@ func calculateValues() -> (Double, Double) {
 
 let (value1, value2) = calculateValues()
 print("Value 1: \(value1), Value 2: \(value2)")
+```
+
+## Trows
+
+Throws is a keyword used in function declarations to indicate that a function can potentially "throw" an error durring it's execution.
+
+Functions marked with throws can propagate error to the calling code, allowing the errors to be handled or passed up the call stack.
+
+Using throws and do-catch blocks provides a structured way to handle errors in Swift, promoting safety and reliability in code that can potentially fail due to exceptional circumstances.
+
+**Exemple: ** 
+```
+enum FileError: Error {
+    case fileNotFound
+    case permissionDenied
+}
+
+func readFile() throws -> String {
+    // Reading a file (example implementation)
+    if fileNotPresent {
+        throw FileError.fileNotFound
+    }
+    if insufficientPermissions {
+        throw FileError.permissionDenied
+    }
+    return "File content"
+}
+
+// Using the throwing function
+do {
+    let fileContent = try readFile()
+    print("File content: \(fileContent)")
+} catch FileError.fileNotFound {
+    print("File not found error")
+} catch FileError.permissionDenied {
+    print("Permission denied error")
+} catch {
+    print("An unknown error occurred")
+}
+```
+
+More examples using Throws:
+
+#### Custom Error Types
+
+```
+enum AuthenticationError: Error {
+    case invalidUsername
+    case invalidPassword
+}
+
+func authenticate(username: String, password: String) throws -> Bool {
+    guard username == "admin" else {
+        throw AuthenticationError.invalidUsername
+    }
+    guard password == "password123" else {
+        throw AuthenticationError.invalidPassword
+    }
+    return true
+}
+
+do {
+    let isLoggedIn = try authenticate(username: "admin", password: "password123")
+    print("Authentication success: \(isLoggedIn)")
+} catch AuthenticationError.invalidUsername {
+    print("Invalid username")
+} catch AuthenticationError.invalidPassword {
+    print("Invalid password")
+} catch {
+    print("An unknown error occurred")
+}
+
+```
+
+#### Handling Specific Errors
+
+```
+enum DivisionError: Error {
+    case divisionByZero
+}
+
+func divide(_ dividend: Int, by divisor: Int) throws -> Int {
+    guard divisor != 0 else {
+        throw DivisionError.divisionByZero
+    }
+    return dividend / divisor
+}
+
+do {
+    let result = try divide(10, by: 0)
+    print("Result: \(result)")
+} catch DivisionError.divisionByZero {
+    print("Division by zero error")
+} catch {
+    print("An unknown error occurred")
+}
+```
+
+#### Fallback with try?
+
+```
+func processNumber(from string: String) throws -> Int {
+    guard let number = Int(string) else {
+        throw NSError(domain: "InvalidNumber", code: 1, userInfo: nil)
+    }
+    return number
+}
+
+let userInput = "abc"
+let number = try? processNumber(from: userInput)
+print("Parsed number: \(number ?? 0)") // Output: Parsed number: 0 (due to failure to parse 'abc' as an Int)
 ```
 
 ## Closure
@@ -1008,7 +1571,7 @@ fetchData { data in
 }
 ```
 
-##### Sorting with Custom Logic
+#### Sorting with Custom Logic
 
 Sorting an array of custom objects based on a specific property using closure.
 
@@ -1073,7 +1636,7 @@ class Car: Vehicle {
 
 ```
 
-> **Classes**, **structures** or **enumerations** can adopt (or conform to) protocols by providing implementaions for the required methods and properties in the protocol.
+**Classes**, **structures** or **enumerations** can adopt (or conform to) protocols by providing implementaions for the required methods and properties in the protocol.
 
 **AnyObject** limit the adoption of the protocol to **class types**. It's useful when you specifically want to work with a reference type, because it won't allow any of Swift's structs or enums to be used. AnyObject is also used when you want to restrict a protocol so that it can be used only with classes.
 
@@ -1356,3 +1919,62 @@ deinit {
     // Set other strong references to nil...
 }
 ```
+
+## CI/CD
+
+
+### CI (Continuous integration)
+
+> Objective: To frequently integrate code changes into a shared repository, where automated builds and tests are run.
+
+#### Workflow:
+
+#### Version Control
+
+Developer work on their local branches and push changes to a central repository (Github, Gitlab)
+
+#### Trigger Build
+
+Each push or merge triggers a CI server (Jenking, Travis) to automatically start the build process.
+
+#### Build & Teste
+ 
+The CI server compiles the code, runs automated tests and check for error.
+
+#### Feedback
+
+Developers receive immediate feedback on the status of their changes (sucess, failures or warnings)
+
+Tools examples: **Jenkins, Travis CI, CircleCI, Github Actions**
+
+### CD (Continuous Delivery / Continuous Deployment)
+
+> Objective: To automate the process of delivering code changes to production or making them available for release.
+
+### Worflow
+
+After successful CI, the code is ready for development to various enviromments(staging, testing, pre-production)
+
+#### Successful Build
+
+Code passes all tests in CI.
+
+#### Deployment to Staging
+
+The build artifact is deployed to a staging environment for further testing and validation.
+
+#### Manual Approval
+
+A manual approval process or additional automated tests might be conducted in the staging environments.
+
+#### Release 
+
+If approved, the code is released to production or made available for manual release.
+
+#### A Combined Example
+
+1. Developers push changes to Github
+2. Jenkins, upon detecting changes, triggers a build and automated tests.
+3. Upon successful testing, Jenkins uses Docker to package the application into containers and deploys it to staginig.
+4. Automated tests run in the staging environment.
+5. If all tests pass and manual approvals are obtained, Jenkins automatically deploys the changes to production.
