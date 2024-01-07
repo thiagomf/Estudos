@@ -572,6 +572,145 @@ someFunction(&value) // Pass the variable with the "&" before the variable name
 print(value) // The value is modified to 11
 ```
 
+## Generics
+
+Generics in swift allow you to write flexible and reusable functions, structures, classes, and enums that can work with any type. They enable you write code that doesn't depend on specific data types, making your code more adaptable and reusable.
+
+#### Reusability
+Generics enable writing functions and types that can work with any type.
+
+They allow you to write flexible code that doesn't need to be duplicated for different data types.
+
+#### Type Safety
+Generics maintain strong type safety by allowing you to define placeholders for types.
+
+They provide type information at compile-time, ensuring that the code is correctly used with compatible types.
+
+#### Code Optimization
+Generics help avoid code redundancy by writing a single implementation that works with different types.
+
+This reduces the need for creating specialized version of function or structures for each data type.
+
+**Examples:**
+
+Generic Functions
+
+```
+func swapValues<T>(_ a: inout T, _ b: inout T) {
+    let temp = a
+    a = b
+    b = temp
+}
+
+var x = 5
+var y = 10
+swapValues(&x, &y) // Swaps the values of x and y
+```
+
+Generic Types (Classes, Structs, Enums)
+
+```
+struct Queue<T> {
+    var elements: [T] = []
+    
+    mutating func enqueue(_ element: T) {
+        elements.append(element)
+    }
+    
+    mutating func dequeue() -> T? {
+        return elements.isEmpty ? nil : elements.removeFirst()
+    }
+}
+
+var intQueue = Queue<Int>()
+intQueue.enqueue(1)
+intQueue.enqueue(2)
+let dequeuedValue = intQueue.dequeue() // dequeuedValue = 1
+
+```
+
+Associated Types
+
+```
+protocol Container {
+    associatedtype Item
+    mutating func append(_ item: Item)
+    var count: Int { get }
+}
+
+struct Stack<T>: Container {
+    private var items: [T] = []
+    
+    mutating func push(_ item: T) {
+        items.append(item)
+    }
+    
+    mutating func pop() -> T? {
+        return items.popLast()
+    }
+    
+    // Implementing Container protocol
+    mutating func append(_ item: T) {
+        self.push(item)
+    }
+    
+    var count: Int {
+        return items.count
+    }
+}
+```
+Associated types in protocols provide flexibility by allowing conforming types to define specific types for associated placeholders, enablind protocol-oriented designs and generic programming patterns.
+
+**More example**:
+
+```
+// Protocol with an associated type
+protocol Printable {
+    associatedtype PrintableItem // Placeholder for the printable item type
+    
+    var description: String { get }
+    func printItem(_ item: PrintableItem)
+}
+
+// Conforming types using associated types
+struct Printer<T>: Printable {
+    // Associated type defined as `T` for the Printer
+    typealias PrintableItem = T
+    
+    var description: String {
+        return "Printer with type \(T.self)"
+    }
+    
+    func printItem(_ item: T) {
+        print("Printing: \(item)")
+    }
+}
+
+// Another conforming type using a different associated type
+struct Document: Printable {
+    // Associated type defined as `String` for the Document
+    typealias PrintableItem = String
+    
+    var description: String {
+        return "Document Printer"
+    }
+    
+    func printItem(_ item: String) {
+        print("Document: \(item)")
+    }
+}
+
+// Example usage:
+let numberPrinter = Printer<Int>()
+numberPrinter.printItem(10) // Output: Printing: 10
+print(numberPrinter.description) // Output: Printer with type Int
+
+let docPrinter = Document()
+docPrinter.printItem("Sample Document") // Output: Document: Sample Document
+print(docPrinter.description) // Output: Document Printer
+```
+
+
 ## Guard
 
 Guard helps in writing defensive code by handling the conditions that must be met before executiong the rest of the code block, contributing to safer and more readable Swift code.
