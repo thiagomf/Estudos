@@ -15,11 +15,6 @@ Design patterns
 - O que é Chain of Responsibility?
 - O que é um Observable?
 
-Testes
-
-- O que é BDD e TDD? Qual a diferença entre os dois?
-- Já utilizou XCTest? Como funciona o ciclo de testes com o XCTest?
-- Com funciona uma pirâmide de testes? Explique os níveis
 
 Agilidade
 
@@ -248,7 +243,7 @@ class PrinterClient {
 
 Applying the Interface Segregation Principle helps in desiging more focused and specialized protocols, reducing unnecessary dependencies and making the codebase more maintainable and adaptable to change.
 
-##### Dependency Inversion Principle (DIP)
+#### Dependency Inversion Principle (DIP)
 
 High-level modules should not depend on low-level modules. Both should depend on abstractions.
 
@@ -300,7 +295,6 @@ let smsMessageService = MessageService(messenger: smsMessenger)
 emailMessageService.sendNotification(message: "Important email notification")
 smsMessageService.sendNotification(message: "Urgent SMS alert")
 ```
-
 
 ## What is swift? 
 
@@ -1978,3 +1972,214 @@ If approved, the code is released to production or made available for manual rel
 3. Upon successful testing, Jenkins uses Docker to package the application into containers and deploys it to staginig.
 4. Automated tests run in the staging environment.
 5. If all tests pass and manual approvals are obtained, Jenkins automatically deploys the changes to production.
+
+# BDD
+
+It's an agile software development methodology that emphasizes collaboration among developers, quality assurance (QA) engineers, product owners and business stakeholders throughout the software development process.
+
+Key Aspects: 
+
+### Behavior-Centric Approach
+
+BDD focuses on defining the behavior of software through scenarios that describe how the system should behave from a user's perpective.
+Scenarios are written in a common language. (often using tools like Gherkin)
+
+Example of Gherkin:
+
+```
+Feature: Checkout Process
+  As a registered user
+  I want to be able to add items to my cart
+  So that I can proceed to checkout
+
+  Scenario: Adding items to the cart
+    Given I am a registered user
+    When I add an item with ID "123" to my cart
+    Then the item should be in my cart
+    And the cart total should reflect the item price
+```
+
+### Collaboration and Communication
+
+BDD encourages close collaboration between technical and non-technical team members to define and refine user stories.
+
+### Automated Acceptance Tests
+
+BDD promotes the creation of automated acceptance tests based on the defined scenarios.
+Theses tests serve as living documentation and verify that the system behaves as intended based on the specified behaviors.
+
+### Iterative Development
+
+BDD follows an iterative development process, where features are built incrementally based on user stories and their corresponding behavior scenarios.
+
+### Continuous Feedback and Adaptation
+
+BDD encourages continuos feedback loops between stakeholders, allowing for adaptations and refinements based on feedback received during development.
+
+### Focus on Business Value
+
+BDD aims to align software development with business objectives by emphasizing the delivery of features that provide value to users.
+
+### BDD in Swift
+
+Implementing Behavior-Driven Development (BDD) involves using BDD Frameworks and tools that facilitate writing and excuting behavior-driven tests. While swift doesn't have a native BDD-specific framework, there are third-party libraries and tools that enable BDD practices within Swift projects.
+
+Examples: 
+
+### XCTest
+
+> Although XCTest can be used for BDD-style testing with Given-When-Then approach, some third-party frameworks offer more expressive BDD syntax.
+
+```
+import XCTest
+
+class ShoppingCartTests: XCTestCase {
+    func testAddingItemToCart() {
+        // Given
+        let shoppingCart = ShoppingCart()
+        let item = Item(id: "123", name: "Example Item", price: 10.0)
+        
+        // When
+        shoppingCart.addItem(item)
+        
+        // Then
+        XCTAssertTrue(shoppingCart.contains(item))
+        XCTAssertEqual(shoppingCart.total, 10.0)
+    }
+}
+```
+
+### Quick and Nimble
+
+**Quick** is a behavior-driven-development framework for swift and objective-c that works well with **Nimble**.
+
+```
+import Quick
+import Nimble
+
+class ShoppingCartSpec: QuickSpec { //Quick
+    override func spec() {
+        describe("Shopping Cart") { //Quick
+            it("should add an item and update total") { //Quick
+                let shoppingCart = ShoppingCart()
+                let item = Item(id: "123", name: "Example Item", price: 10.0)
+                
+                shoppingCart.addItem(item)
+                
+                expect(shoppingCart.contains(item)).to(beTrue()) //Nimble
+                expect(shoppingCart.total).to(equal(10.0)) //Nimble
+            }
+        }
+    }
+}
+```
+
+**More examples:**
+
+```
+import Quick
+import Nimble
+
+class ShoppingCartSpec: QuickSpec { // Quick
+    override func spec() {
+        describe("Shopping Cart") { //Quick
+            var shoppingCart: ShoppingCart!
+            let item = Item(id: "123", name: "Example Item", price: 10.0)
+            
+            beforeEach { //Quick
+                shoppingCart = ShoppingCart()
+            }
+            
+            context("when adding items") { // Quick
+                it("should contain the added item") { // Quick
+                    shoppingCart.addItem(item)
+                    expect(shoppingCart.contains(item)).to(beTrue()) //Nimble
+                }
+                
+                it("should update the cart total") { // Quick
+                    shoppingCart.addItem(item)
+                    expect(shoppingCart.total).to(equal(10.0)) //Nimble
+                }
+            }
+        }
+    }
+}
+```
+
+**QuickSpec, describe, context, it and beforeEach** is an example of Quick.
+
+**expect(...), .to(equal(...)), .toNot(beEmpty())** is an example of Nimble.
+
+## TDD
+
+Test-Driven Development, a software development methodology that revolves around writing tests before writing the actual code.
+
+The process involves iterative cycles of writing tests, implementing code to pass those tests, and refactoring the code to improve it's structure while ensuring it continues to pass the tests.
+
+1. Write Test First - Before writing any code, developers write automated tests
+2. Red-Green-Refactor Cycle - RED: Write a test taht initially fails. GREEN: Write the minimum amount of code to make the test pass.
+3. Small, incremental Steps: TDD encourages breaking down complex problems into small, manageable tasks.
+4. Automated Testing - These tests are run frequently to ensure that new code changes don't introduce regressions or unexpected behavior.
+
+#### WorkFlow
+
+> Write a test -> Write the code -> Run the Tests -> Refactor the Code -> Repeat
+
+Example:
+
+```
+import XCTest
+
+// Example of a simple class to test
+class Calculator {
+    func add(_ a: Int, _ b: Int) -> Int {
+        return a + b
+    }
+}
+
+class CalculatorTests: XCTestCase {
+    var calculator: Calculator!
+    
+    override func setUp() {
+        super.setUp()
+        calculator = Calculator()
+    }
+
+    func testAddition() {
+        // Given
+        let a = 5
+        let b = 10
+        
+        // When
+        let result = calculator.add(a, b)
+        
+        // Then
+        XCTAssertEqual(result, 15) // Test case for addition
+    }
+}
+```
+
+## Pyramid Tests
+
+Pyramid Tests refers to a testing stragy that invlves structuring test in a pyramid shape base on their granularity and execution time.
+
+It is emphasizes having more lower-level, faster tests and fewer higher-level, slower tests.
+
+![Alt text](https://www.onpathtesting.com/hs-fs/hubfs/agile%20testing%20pyramid%20onpath%20testing%20QA.png?width=3891&name=agile%20testing%20pyramid%20onpath%20testing%20QA.png "Pyramid Tests")
+
+#### Unit tests (Bottom of the Pyramid)
+
+- At the base of the pyramed are unit tests, which are small, focused tests that verify the behavior of individual components (**functions, methods and classes**) in isolation.
+- It is quick to write and execute, providing fast feedback.
+
+#### Integration Tests (Middle of the Pyramid)
+
+- Above unit tests are integration tests, which validate the interaction and integration between components or modules within an application.
+- These tests ensure that different parts of the system work together as expected.
+- Integration tests might involve multiple components interacting, making them slower that unit tests but faster than end-to-end tests.
+
+#### End-To-End Tests (Top of the pyramid)
+
+- At the top of the pyramid are end-to-end tests, also knows as UI or acceptance tests.
+- These tests validate the entire flow of an application, often interacting with the UI and external dependencies.
+- End-to-End tests are slower, more complex, and can be more fragile compared to lower-level tests.
