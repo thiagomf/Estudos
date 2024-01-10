@@ -5,6 +5,10 @@ import UIKit
 
 class Person {
     var dog: Dog?
+    
+    deinit{
+        print("Person deinitialized")
+    }
 }
 
 class Dog {
@@ -63,7 +67,7 @@ class ClasseA {
 
 class ClasseB {
     
-    weak var classeA: ClasseA?
+    var classeA: ClasseA?
     
     deinit {
         print("Class B deinitializated")
@@ -71,9 +75,9 @@ class ClasseB {
 }
 
 var clA: ClasseA = ClasseA()
-//clA.classeB = ClasseB()
+clA.classeB = nil
 var clB: ClasseB = ClasseB()
-//clB.classeA = ClasseA()
+clB.classeA = nil
 
 protocol Cadastro {
     func addNome(nome:String)
@@ -325,4 +329,46 @@ let numbers = [1,2,3,4]
 let multiplationNumber = numbers.map { $0 * $0 }
 print(multiplationNumber)
 
+//Example of Cycle reference using closure
+class MyClass {
+    var someClosure: (() -> Void)?
+    
+    func setupClosure() {
+        someClosure = {
+            print(self)
+        }
+    }
+    
+    deinit {
+        print("MyClass instance deallocated")
+    }
+}
 
+var myObject: MyClass? = MyClass()
+myObject?.setupClosure()
+myObject = nil // Deallocating the object
+
+//Example Avoid cycle reference in Closure
+class MyClass2 {
+    var someClosure: (() -> Void)?
+    
+    func setupClosure() {
+        someClosure = { [weak self] in // Capture self weakly
+            guard let strongSelf = self else {
+                print("self is deallocated")
+                return
+            }
+            print("Closure executed in \(strongSelf)")
+        }
+    }
+    
+    deinit {
+        print("MyClass instance deallocated")
+    }
+}
+
+var myObject2: MyClass2? = MyClass2()
+myObject2?.setupClosure()
+myObject2?.someClosure?() // Execute the closure
+
+myObject2 = nil // Deallocating the object

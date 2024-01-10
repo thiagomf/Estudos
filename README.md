@@ -15,14 +15,6 @@ Design patterns
 - O que é Chain of Responsibility?
 - O que é um Observable?
 
-
-Agilidade
-
-- Já trabalhou com Kanbam?
-- Já utilizou metodologia Scrum?
-- Já trabalhou em times multidisciplinar?
-- Qual sua reação a um Feedback negativo?
-
 ## Interface Builder
 
 #### Inferface builder: StoryBoard or XIB Files UIKIT
@@ -351,6 +343,287 @@ open class MyOpenClass {
 **filePrivateProperty** is acessible within the file where MyOpenClass is defined.
 
 **privateProperty** is only accessible within MyOpenClass itself.
+
+
+# Design Patterns
+
+## MVC (Mode-View-Controller)
+
+A classic pattern where the app divides into three main components: Model(data), View(UI), and Controller (mediator between Model and View).
+
+**Example**: This example showcases the separation of concerns, where the **model** (Counter), holds the data, the **view** (ViewController and associated UI Elements) display the data, and the controller (View Controller) manages the interaction between the model and the view.
+
+**Model:**
+
+```
+// Counter model
+class Counter {
+    var count = 0
+}
+```
+
+**View: **
+
+```
+import UIKit
+
+// View Controller
+class ViewController: UIViewController {
+    @IBOutlet weak var countLabel: UILabel!
+    
+    var model = Counter() // Model instance
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        updateCounterLabel()
+    }
+    
+    func updateCounterLabel() {
+        countLabel.text = "Count: \(model.count)"
+    }
+    
+    @IBAction func incrementButtonTapped(_ sender: UIButton) {
+        model.count += 1 // Increment the count in the model
+        updateCounterLabel() // Update the view
+    }
+}
+```
+
+## MVVM
+
+MVVM (Model-View-ViewModel) is an architectural design pattern that aims to separate the presentation layer from the business logic and data access in applications. It's widely used in Swift and iOS development to create maintainable and testable code.
+
+**Model:** Represents the data entities and business logic. For example, networking code, database interactions, or any data manipulation.
+
+Example: 
+
+```
+// Model
+struct User {
+    let username: String
+}
+```
+
+**View:** Consists of the UI Elements, including storyboards, view controllers, and SwiftUI views. The View binds to properties in the ViewModel and updates itself based on changes.
+
+Example: 
+
+```
+// View (ViewController)
+class ProfileViewController: UIViewController {
+    @IBOutlet weak var usernameLabel: UILabel!
+    
+    var viewModel: UserViewModel! // Injected ViewModel
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        updateUI()
+    }
+    
+    func updateUI() {
+        usernameLabel.text = viewModel.usernameText
+    }
+}
+```
+
+**ViewModel:** Contains the presentation loginc and data needed by the view. It prepares the data to be displayed, handles user interactions, and communicates with the Model layer. The ViewModel doesn't have any reference to the View.
+
+Example: 
+
+```
+// ViewModel
+class UserViewModel {
+    var user: User
+    
+    init(user: User) {
+        self.user = user
+    }
+    
+    var usernameText: String {
+        return "Username: \(user.username)"
+    }
+}
+```
+
+
+## MVVM with Coordinator
+
+#### MVVM-C
+
+How MVVM-C Works:
+
+**Coordinator:** Handles the navigation between ViewControllers, instantiates ViewModel, and manages their dependencies. The coordinator is responsible for creating and pushing/presenting ViewController while injecting their respective ViewModels.
+
+Example:
+
+```
+// Coordinator
+protocol Coordinator {
+    func start()
+}
+
+class MainCoordinator: Coordinator {
+    var navigationController: UINavigationController
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+    
+    func start() {
+        let user = User(username: "JohnDoe")
+        let viewModel = UserViewModel(user: user)
+        let profileVC = ProfileViewController.instantiate()
+        profileVC.viewModel = viewModel
+        navigationController.pushViewController(profileVC, animated: true)
+    }
+}
+
+// View
+class ProfileViewController: UIViewController {
+    @IBOutlet weak var usernameLabel: UILabel!
+    var viewModel: UserViewModel!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        updateUI()
+    }
+    
+    func updateUI() {
+        usernameLabel.text = viewModel.usernameText
+    }
+    
+    static func instantiate() -> ProfileViewController {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: "ProfileViewController") as! ProfileViewController
+        return vc
+    }
+}
+
+// ViewModel and Model remain the same
+```
+
+## VIPER
+
+Viper is an architectural design pattern primarily used in IOS app development to enhance code reusability, scalability, and testability by separating te app into distinct modules or components, each with it's specific responsibility.
+
+**VIEW**: 
+- Represents the user interface elements
+- Passes user actions to the Presenter and display data from the Presenter.
+
+```
+// View (ViewController)
+class TodoListViewController: UIViewController {
+    var presenter: TodoListPresenterProtocol?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        presenter?.viewDidLoad()
+    }
+    
+    func displayTodoItems(items: [TodoItem]) {
+        // Update UI to display todo items
+        for item in items {
+            print("Title: \(item.title), Completed: \(item.completed)")
+        }
+    }
+}
+```
+
+**PRESENTER**:
+- Acts as a mediator between the View and Interactor
+- Receives user actions from the View and requests data manipulation from the Interactor.
+- Formats the data from the Interactor and passes it to the View for display.
+
+```
+// Presenter
+protocol TodoListPresenterProtocol {
+    func presentTodoItems(items: [TodoItem])
+}
+
+class TodoListPresenter: TodoListPresenterProtocol {
+    weak var viewController: TodoListViewController?
+    var interactor: TodoListInteractorProtocol?
+    
+    func viewDidLoad() {
+        let items = interactor?.fetchTodoItems() ?? []
+        presentTodoItems(items: items)
+    }
+    
+    func presentTodoItems(items: [TodoItem]) {
+        viewController?.displayTodoItems(items: items)
+    }
+}
+```
+
+**INTERACTOR**:
+- Constains business logic, performs data manipulatio, and interacts with the data source (API, database)
+- Notifies the Presenter of the results. 
+
+```
+// Interactor
+protocol TodoListInteractorProtocol {
+    func fetchTodoItems() -> [TodoItem]
+}
+
+class TodoListInteractor: TodoListInteractorProtocol {
+    func fetchTodoItems() -> [TodoItem] {
+        // Code to fetch todo items from a data source (e.g., database, API)
+        return [
+            TodoItem(id: 1, title: "Buy groceries", completed: false),
+            TodoItem(id: 2, title: "Finish homework", completed: true)
+        ]
+    }
+}
+```
+
+**ENTITY**: 
+- Represents the data models or entities used in the app.
+- Usually, plain data objects without any business logic.
+
+```
+// Entity
+struct TodoItem {
+    let id: Int
+    let title: String
+    let completed: Bool
+}
+```
+
+**ROUTER**:
+- Handles navigation between different modules or components (ViewControlllers)
+- Isolates navigation logic from the ViewControllers.
+- Responsible for creating and presenting new ViewControllers.
+
+```
+// Router
+protocol TodoListRouterProtocol {
+    static func createTodoListModule() -> UIViewController
+}
+
+class TodoListRouter: TodoListRouterProtocol {
+    static func createTodoListModule() -> UIViewController {
+        let viewController = TodoListViewController()
+        let presenter = TodoListPresenter()
+        let interactor = TodoListInteractor()
+        
+        viewController.presenter = presenter
+        presenter.viewController = viewController
+        presenter.interactor = interactor
+        
+        return viewController
+    }
+}
+```
+
+```
+// Usage in App (e.g., AppDelegate)
+let todoListModule = TodoListRouter.createTodoListModule()
+// Present `todoListModule` in the app's navigation stack or window
+```
+
+## Diference between Coordinator and Router
+
+Coordinators generally focus on the **navigation flow** between individual view controllers/screens, **abstracting away the navigation logic**. **Routers**, in architectures like VIPER or Clean Swift, **manage the transitions between larger architectural components or modules.**
 
 ## Encapsulation
 
@@ -1300,9 +1573,9 @@ class Car: Vehicle {
 
 Sometimes we are trying to perform multiple tasks at the same time,that time most of the developer facing applications hang or freezing issue. That's why **we are using GCD, to manage multiple task at the same time.**
 
-**Concurrenct** - It's starting multiple tasks at the same time, but not garantee for the finish at same time. It's can finish any order.
+**Concurrenct** - It's starting multiple tasks at the same time, but not garantee for the finish at same time. It's can finish any order. (**Async**)
 
-**Serial** - It's executing one task at a time.
+**Serial** - It's executing one task at a time. (**Sync**)
 
 ```
 // Get a reference to the global concurrent queue
@@ -1384,6 +1657,170 @@ asyncWork()
 **Global Queue** - Using to perform non-UI work in the background.
 
 **Main Queue** - Using to update the UI after completing work in a task on a concurrent queue.
+
+```
+let mainQueue = DispatchQueue.main // Main Queue
+let globalQueue = DispatchQueue.global() // Global Queue
+let customSerialQueue = DispatchQueue(label: "com.example.serialQueue") // Custom Serial Queue
+let customConcurrentQueue = DispatchQueue(label: "com.example.concurrentQueue", attributes: .concurrent) // Custom Concurrent Queue
+```
+
+#### Another kinds of DispatchQueue
+
+```
+let group = DispatchGroup() // DispatchGroup
+let semaphore = DispatchSemaphore(value: 1) // DispatchSemaphore
+let workItem = DispatchWorkItem { print("WorkItem executed") } // DispatchWorkItem
+let timer = DispatchSource.makeTimerSource() // DispatchSource (Timer)
+```
+
+#### DispatchGroup
+
+Synchronizes multiple tasks and waits for their completion using enter() and leave() methods. Uses notify(queue:) to execute a closure when all tasks are finished.
+
+```
+import Foundation
+
+// Create a DispatchGroup
+let group = DispatchGroup()
+
+// Simulated asynchronous tasks
+func performTask(number: Int) {
+    DispatchQueue.global().async(group: group) {
+        // Simulate an asynchronous task
+        Thread.sleep(forTimeInterval: TimeInterval.random(in: 1...3))
+        print("Task \(number) completed")
+    }
+}
+
+// Perform multiple tasks
+performTask(number: 1)
+performTask(number: 2)
+performTask(number: 3)
+
+// Notify when all tasks are completed
+group.notify(queue: .main) {
+    print("All tasks finished. Ready to proceed!")
+}
+```
+
+**performTask** simulates an asynchronosus task using DispatchQueue.global().async
+
+Each task is associated with the DispatchGroup using **async(group:)**
+
+After enqueuing the task, **group.notify** is called with closure that will execute when all tasks in the group complete.
+
+The closure within '**group.notify**'executes on the main queue, indicating that all tasks have finished.
+
+#### DispatchSemaphore
+
+Controls access to a resource with a counter that decrements and increments with wait() and signal(). Useful for synchronization.
+
+```
+import Foundation
+
+// Create a semaphore with an initial value of 2
+let semaphore = DispatchSemaphore(value: 2)
+
+// Simulate a resource shared among multiple tasks
+var sharedResource = [Int]()
+
+// Function representing a task that accesses the shared resource
+func accessSharedResource(_ id: Int) {
+    print("Task \(id) waiting to access the resource")
+    
+    // Wait on the semaphore, decrementing its value
+    semaphore.wait()
+    
+    print("Task \(id) is accessing the resource")
+    
+    // Simulate accessing the shared resource
+    sharedResource.append(id)
+    
+    // Simulate some work being done
+    Thread.sleep(forTimeInterval: 2)
+    
+    print("Task \(id) finished accessing the resource")
+    
+    // Signal that the task has finished and release the semaphore
+    semaphore.signal()
+}
+
+// Create multiple concurrent tasks trying to access the resource
+for i in 0..<5 {
+    DispatchQueue.global().async {
+        accessSharedResource(i)
+    }
+}
+
+// Wait for a few seconds to allow tasks to finish
+Thread.sleep(forTimeInterval: 10)
+print("Final shared resource: \(sharedResource)")
+```
+
+A **DispatchSemaphore** with an initial value of 2 is created
+
+Five tasks attempt to access a shared resource (in this case, an array).
+
+The semaphore ensures that at most two tasks can access the resource concurrently.
+
+Each task waits on the semaphore with '**wait()**', accesses the resource, performs some work, and the signals ('**signal()**') that it has finished, allowing other tasks to access the resource.
+
+> Semaphores are commonly used in scenarios where you want to control access to limited resources or manage the concurrency of tasks accessing a shared resource.
+
+#### DispatchWorkItem
+
+Represents a task or block of code to be executed. Can be canceled, scheduled, or dipatched onto a queue.
+
+```
+import Foundation
+
+// Create a queue to perform the work item
+let queue = DispatchQueue(label: "com.example.workItemQueue")
+
+// Define a work item
+let workItem = DispatchWorkItem {
+    print("Work item is executing")
+    // Simulate some task
+    for i in 1...3 {
+        print("Task \(i)")
+        Thread.sleep(forTimeInterval: 1)
+    }
+    print("Work item finished")
+}
+
+// Execute the work item asynchronously on the specified queue
+queue.async(execute: workItem)
+
+// You can also wait for the work item to finish if needed
+workItem.wait()
+
+// You can also cancel the work item if it's not yet started
+// workItem.cancel()
+
+// Perform other tasks while the work item is running asynchronously
+print("Performing other tasks...")
+
+// Wait for a few seconds to allow the work item to execute
+Thread.sleep(forTimeInterval: 2)
+
+```
+
+A **DispatchQueue** named queue is created.
+
+A **DispatchWorkItem** named **workItem** is defined. This work item contains a block of code that simulates a task by printing messages and pausing for one second between each message.
+
+The work item is executed asynchronously on the **queue** using **queue.async(execute: workItem)**
+
+**workItem.wait()** is called to block the current thread until the work item completes. This is optional and used here just to illustrate the point. In practice, you might not want to block the current thread.
+
+While the work item is running asynchronously, other task can be perfomed on the main thread or other queues.
+
+> DispatchWorkItem offers flexibility. You can also cancel the work item using workItem.cancel() if it hasn't started executing yet, allowing you to control task execution more precisely.
+
+#### DispatchSource
+
+Monitors various system events like file descriptors, signals, timers, etc., using sources such as "**DispatchSourceTimer**", "**DispatchSourceFileSystemObject**", etc.
 
 
 ## Async/Await
@@ -2187,6 +2624,55 @@ class ShoppingCartTests: XCTestCase {
     }
 }
 ```
+
+#### What is expectation in XCTestExpectation
+
+Is a part of the XCtest Framework in Swift, used for asynchronous testing. It allows you to test asynchronous operations by creating an expectation for a certain condition to be fulfilled within a specific time frame.
+
+Example:
+
+```
+class AsyncTestExample {
+    func performAsyncTask(completion: @escaping () -> Void) {
+        DispatchQueue.global().async {
+            // Simulating an asynchronous task
+            Thread.sleep(forTimeInterval: 2)
+            completion()
+        }
+    }
+}
+```
+
+```
+import XCTest
+
+class AsyncTestExampleTests: XCTestCase {
+    func testAsyncTask() {
+        let asyncExample = AsyncTestExample()
+        
+        let expectation = expectation(description: "Async task expectation")
+        
+        asyncExample.performAsyncTask {
+            // Fulfill the expectation when the async task completes
+            expectation.fulfill()
+        }
+        
+        // Wait for the expectation to be fulfilled within 3 seconds
+        waitForExpectations(timeout: 3) { error in
+            XCTAssertNil(error, "Expectation timed out")
+        }
+    }
+}
+```
+
+**expectation(description:)** created an expectation with a description.
+
+**fulfill()** marks the expectation as fulfilled when the asynchronous task completes.
+
+**waitForExpectations(timeout: handler:)** waits for the expectation to be fulfilled or times out after the specified duration.
+
+**XCTAssertNil** verifies that the expectation didn't time out.
+
 
 ### Quick and Nimble
 
