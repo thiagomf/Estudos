@@ -1,13 +1,5 @@
 # Topics to study
 
-Roteiro técnico para entrevista
-
-Arquitetura e organização:
-
-- Arquiteturas: MVC, MVVM-C entre outras arquiteturas que você saiba para poder perguntar
-- Interface builder: .xib, viewCode e SwiftUI, como ele constrói as interfaces
-- Gerenciadores de dependecias: Cocoapods, Carthage e Swift Package Manager
-
 Design patterns
 
 - O que é Strategy?
@@ -983,7 +975,6 @@ docPrinter.printItem("Sample Document") // Output: Document: Sample Document
 print(docPrinter.description) // Output: Document Printer
 ```
 
-
 ## Guard
 
 Guard helps in writing defensive code by handling the conditions that must be met before executiong the rest of the code block, contributing to safer and more readable Swift code.
@@ -1017,6 +1008,127 @@ func processOrder(order: [String: Any]) {
     // ... rest of the code to handle the order
 }
 ```
+
+## Combine
+
+Combine is a framework introduced by Apple that facilitates reactive programming in Swift. It's designed to handle asynchronous and event-based code by providing a declarative Swift API for processing values over time.
+
+Combine concepts:
+
+#### Publishers
+
+Publishers represent a sequence of values over time or asynchronous tasks. They emit elemnts to subscribers.
+
+#### Subscribers
+
+Subscribers receive and handles the values emitted by publishers.
+
+#### Operators
+
+Operators allow manipulation of the stream of data in various ways. (**map, filter, combineLastest, flatMap**)
+
+Example:
+
+```
+import Combine
+
+let numbers = (1...5)
+let publisher = numbers.publisher  // Create a publisher from an array
+
+let subscription = publisher
+    .map { $0 * 2 } // Multiply each emitted value by 2
+    .sink { value in
+        print(value) // Print the transformed values
+    }
+
+```
+
+**Example with SwiftUI**:
+
+```
+import SwiftUI
+import Combine
+
+class ViewModel: ObservableObject {
+    @Published var text = "Initial text"
+}
+
+struct ContentView: View {
+    @ObservedObject var viewModel = ViewModel()
+
+    var body: some View {
+        TextField("Enter text", text: $viewModel.text)
+            .padding()
+    }
+}
+```
+
+**Example MVVM with Combine**:
+
+**Model**
+
+```
+struct User {
+    let username: String
+    let email: String
+}
+```
+
+**View Model**
+
+```
+import Combine
+
+class UserViewModel: ObservableObject {
+    @Published var user: User // The published property for reactive updates
+    private var cancellables = Set<AnyCancellable>()
+
+    init(user: User) {
+        self.user = user
+    }
+
+    // Example method to update user's email
+    func updateUserEmail(newEmail: String) {
+        user = User(username: user.username, email: newEmail)
+    }
+}
+```
+
+**View**
+
+```
+import SwiftUI
+
+struct UserView: View {
+    @ObservedObject var viewModel: UserViewModel
+
+    var body: some View {
+        VStack {
+            Text("Username: \(viewModel.user.username)")
+            TextField("Enter new email", text: Binding(
+                get: { viewModel.user.email },
+                set: { viewModel.updateUserEmail(newEmail: $0) }
+            ))
+        }
+        .padding()
+    }
+}
+```
+
+**Putting it together**:
+
+```
+import SwiftUI
+
+struct ContentView: View {
+    @StateObject var userViewModel = UserViewModel(user: User(username: "JohnDoe", email: "john@example.com"))
+
+    var body: some View {
+        UserView(viewModel: userViewModel)
+    }
+}
+```
+
 
 ## Differences between Protocol Oriented Programming (POP) and Object-Oriented Programming (OOP)
 
@@ -1822,6 +1934,67 @@ While the work item is running asynchronously, other task can be perfomed on the
 
 Monitors various system events like file descriptors, signals, timers, etc., using sources such as "**DispatchSourceTimer**", "**DispatchSourceFileSystemObject**", etc.
 
+```
+import Foundation
+
+// Create a file URL
+let fileURL = URL(fileURLWithPath: "/path/to/your/file.txt")
+
+// Create a file descriptor for the file
+let fileDescriptor = open(fileURL.path, O_EVTONLY)
+
+// Create a dispatch queue where the event handler will be executed
+let queue = DispatchQueue(label: "com.example.fileMonitor")
+
+// Create a DispatchSource for monitoring file changes
+let fileMonitorSource = DispatchSource.makeFileSystemObjectSource(
+    fileDescriptor: fileDescriptor,
+    eventMask: .write, // Monitoring write events
+    queue: queue
+)
+
+// Define the event handler
+fileMonitorSource.setEventHandler {
+    print("File was written to")
+    // Here you can take actions in response to the file change
+}
+
+// Define the cancel handler
+fileMonitorSource.setCancelHandler {
+    close(fileDescriptor)
+    print("File monitor canceled")
+}
+
+// Start monitoring the file
+fileMonitorSource.resume()
+
+// Simulate some changes in the file (write to the file)
+let text = "Hello, DispatchSource!"
+try text.write(to: fileURL, atomically: true, encoding: .utf8)
+
+// Wait for a few seconds to allow the event handler to execute
+Thread.sleep(forTimeInterval: 2)
+
+// Don't forget to cancel the DispatchSource when it's no longer needed
+fileMonitorSource.cancel()
+
+```
+
+Creation of a file descriptor for the specified file.
+
+Creation of a **DispatchSource** using **DispatchSource.makeFileSystemObjectSource** to monitor write events (**eventMask: .write**) on the file.
+
+Setting an event handler using **setEventHandler** that will be executed when the specified event (write to the file) occurs.
+
+Setting a cancel handler using **setCancelHandler** to clean up resources when the source is canceled.
+
+Resuming the **DispatchSource** to start monitoring the file.
+
+Simulating a change in the file by writing some text to it.
+
+Waiting for a few seconds to allow the event handler to execute.
+
+Canceling the **DispatchSource** to stop monitoring the file.
 
 ## Async/Await
 
