@@ -3,5 +3,7 @@
     <pages>
         <page name='Treinamento2'/>
         <page name='Treinamento1'/>
+        <page name='Tests'/>
+        <page name='SOLID Principles'/>
     </pages>
 </playground>

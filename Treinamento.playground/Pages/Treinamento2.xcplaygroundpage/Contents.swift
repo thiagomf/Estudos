@@ -363,7 +363,7 @@ class MyClass2 {
     }
     
     deinit {
-        print("MyClass instance deallocated")
+        print("MyClass2 instance deallocated")
     }
 }
 
@@ -372,3 +372,4 @@ myObject2?.setupClosure()
 myObject2?.someClosure?() // Execute the closure
 
 myObject2 = nil // Deallocating the object
+
