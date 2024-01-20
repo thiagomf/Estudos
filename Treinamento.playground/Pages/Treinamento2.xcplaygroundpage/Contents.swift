@@ -27,7 +27,6 @@ fido?.owner = john
 john = nil
 fido = nil
 
-
 class Customer {
     
     var creditCard: CreditCard?
@@ -67,17 +66,20 @@ class ClasseA {
 
 class ClasseB {
     
-    var classeA: ClasseA?
+    weak var classeA: ClasseA?
     
     deinit {
         print("Class B deinitializated")
     }
 }
 
-var clA: ClasseA = ClasseA()
-clA.classeB = nil
-var clB: ClasseB = ClasseB()
-clB.classeA = nil
+var clA: ClasseA? = ClasseA()
+var clB: ClasseB? = ClasseB()
+clA?.classeB = clB
+clB?.classeA = clA
+
+clA = nil
+clB = nil
 
 protocol Cadastro {
     func addNome(nome:String)
@@ -205,6 +207,78 @@ func asyncWork() {
 
 asyncWork()
 
+//MARK: DispatchGroup
+
+let group = DispatchGroup()
+
+func performTask(number: Int)  {
+    DispatchQueue.global().async(group: group) {
+        Thread.sleep(forTimeInterval: TimeInterval.random(in: 1...3))
+        print("Task \(number) completed")
+    }
+}
+
+//simulates asynchronous task
+//performTask(number: 1)
+//performTask(number: 2)
+//performTask(number: 3)
+//
+//group.notify(queue: .main) {
+//    print("All tasks finished. Ready Process")
+//}
+
+//MARK: Dispatch Semaphore
+
+let semaphore = DispatchSemaphore(value: 2)
+
+var sharedResource = [Int]()
+
+func acessSharedResource(_ id: Int) {
+    
+    print("Task \(id) waiting to acess the resource")
+    
+    semaphore.wait()
+    
+    print("Task \(id) is acessing the resource")
+    
+    sharedResource.append(id)
+    
+    Thread.sleep(forTimeInterval: 2)
+    
+    print("Task \(id) finished the resource")
+    
+    semaphore.signal()
+    
+}
+
+for i in 0..<5 {
+    DispatchQueue.global().async {
+        acessSharedResource(i)
+    }
+}
+
+Thread.sleep(forTimeInterval: 10)
+print("Final shared resouce: \(sharedResource)")
+
+//MARK: DispatchWork Item
+
+let queue = DispatchQueue(label: "com.example.workItemQueue")
+
+let workItem = DispatchWorkItem {
+    print("Work item is executing")
+    
+    for i in 1...3 {
+        print("Task \(i)")
+        Thread.sleep(forTimeInterval: 1)
+    }
+    
+    print("Work item finished")
+}
+
+queue.async(execute: workItem)
+workItem.wait()
+workItem.cancel()
+
 //MARK: Async/Await
 
 enum CountError: Error {
@@ -216,7 +290,7 @@ func counterData() async throws -> String {
         guard number < 10 else {
             throw CountError.outOfRange
         }
-        print("Processing \(number)")
+        print("Counter 10 -> Processing \(number)")
     }
     return "Count Finished"
 }
@@ -226,7 +300,7 @@ func counterDataTo20() async throws -> String {
         guard number < 21 else {
             throw CountError.outOfRange
         }
-        print("Processing \(number)")
+        print("Counter 20 -> Processing \(number)")
     }
     return "Count Finished"
 }

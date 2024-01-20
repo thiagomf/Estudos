@@ -387,6 +387,7 @@ if doberman === chihuahua { print("Same reference memory") }
 
 //MARK: Mutability
 //Value Type
+
 struct Bike {
     var brand: String
     let km: Int
