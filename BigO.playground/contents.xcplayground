@@ -2,10 +2,15 @@
 <playground version='6.0' target-platform='ios' buildActiveScheme='true' importAppTypes='true'>
     <pages>
         <page name='Constant Time'/>
-        <page name='TheBigO'/>
         <page name='Linear Time'/>
         <page name='Quadratic Time'/>
         <page name='Recursion'/>
         <page name='Algorithms'/>
+        <page name='Deque'/>
+        <page name='Selection Sort'/>
+        <page name='Insertion Sort'/>
+        <page name='Bubble Sort'/>
+        <page name='Quick Sort'/>
+        <page name='Merge Sort'/>
     </pages>
 </playground>

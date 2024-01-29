@@ -10,6 +10,26 @@ public extension Array where Element == Int {
         return Array(0..<size).shuffled()
     }
     
+    static func incrementalArray(size: Int) -> [Int] {
+        
+        var result = [Int](repeating: 0, count: size)
+        
+        for i in 0..<size {
+            result[i] = i
+        }
+        
+        return result
+    }
+    
+    func startWithZero() -> Bool {
+        
+        guard self.isEmpty == false else {
+            return false
+        }
+        
+        return self.first == 0 ? true : false
+    }
+    
     func sum() -> Int {
         
         var result = 0
