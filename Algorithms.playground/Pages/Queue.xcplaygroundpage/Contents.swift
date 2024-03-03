@@ -32,8 +32,8 @@ public class Queue {
             first = newNode
             last = newNode
         } else {
-            newNode.next = last
-            newNode = last
+            last?.next = newNode
+            last = newNode
         }
         
         lenght += 1
@@ -41,7 +41,7 @@ public class Queue {
     
     public func dequeue() -> Node? {
         
-        guard lenght > 0 1 else {
+        guard lenght > 0 else {
             return nil
         }
         
@@ -59,6 +59,29 @@ public class Queue {
         
         return temp
     }
+    
+    public func printQueue() {
+        
+        var temp = first
+        
+        while temp != nil {
+            print(temp?.value ?? 0)
+            temp = temp?.next
+        }
+    }
+    
+    public func getFirst() {
+        print("The first value is \(first?.value ?? 0)")
+    }
+    
+    public func getLast() {
+        print("The last value is \(last?.value ?? 0)")
+    }
 }
+
+var exemple = Queue(value: 1)
+exemple.enqueue(value: 2)
+exemple.enqueue(value: 3)
+exemple.printQueue()
 
 //: [Next](@next)
