@@ -8,5 +8,7 @@
         <page name='Stack'/>
         <page name='Queue'/>
         <page name='Exercises STK'/>
+        <page name='BinaryTree'/>
+        <page name='HashTable'/>
     </pages>
 </playground>
