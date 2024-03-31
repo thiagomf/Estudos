@@ -10,5 +10,6 @@
         <page name='Exercises STK'/>
         <page name='BinaryTree'/>
         <page name='HashTable'/>
+        <page name='Exercises Hash'/>
     </pages>
 </playground>
