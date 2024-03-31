@@ -29,9 +29,10 @@ public class HashTable {
     public func printTable() {
         for i in 0..<dataMap.count {
             print("\(i):")
-            let temp = dataMap[i]
+            var temp = dataMap[i]
             while temp != nil {
                 print("  { \(temp?.key ?? "") = \(temp?.value ?? 0) }")
+                temp = temp?.next
             }
         }
     }
@@ -77,8 +78,52 @@ public class HashTable {
             temp?.next = newNode
         }
     }
+    
+    public func get(key: String) -> Int {
+        
+        let index = hash(key: key)
+        
+        var temp = dataMap[index]
+        
+        while temp != nil {
+            if (temp?.key == key) {
+                return temp?.value ?? 0
+            }
+            
+            temp = temp?.next
+        }
+        
+        return 0
+    }
+    
+    
+    public func keys() -> [String] {
+        
+        var allKeys: [String] = []
+        
+        for (index, _) in dataMap.enumerated() {
+            var temp = dataMap[index]
+            while(temp != nil) {
+                allKeys.append(temp?.key ?? "")
+                temp = temp?.next
+            }
+        }
+        
+        return allKeys
+    }
 }
 
+var myHash = HashTable()
+myHash.set(key: "paint", value: 20)
+myHash.set(key: "bolts", value: 40)
+myHash.set(key: "nails", value: 100)
+myHash.set(key: "tile", value: 50)
+myHash.set(key: "tile", value: 20)
+myHash.set(key: "lumber", value: 80)
 
+myHash.get(key: "tile")
+myHash.get(key: "lomber")
+myHash.printTable()
+myHash.keys()
 
 //: [Next](@next)
