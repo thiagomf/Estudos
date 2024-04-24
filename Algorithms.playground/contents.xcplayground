@@ -11,5 +11,6 @@
         <page name='BinaryTree'/>
         <page name='HashTable'/>
         <page name='Exercises Hash'/>
+        <page name='Graph'/>
     </pages>
 </playground>
